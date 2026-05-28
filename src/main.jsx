@@ -4,7 +4,7 @@ import './styles.css';
 
 const projects = [
   {
-    title: 'Restaurant',
+    title: 'Ресторан',
     client: 'Odun Collectives',
     category: 'website',
     description: 'A cinematic web experience for a warm dining brand with sharp booking paths.',
@@ -12,31 +12,16 @@ const projects = [
     palette: ['#b66f43', '#242529', '#f1d9bf'],
   },
   {
-    title: 'gym page',
+    title: 'Фитнес page',
     client: 'Odun Collectives',
     category: 'website',
     description: 'A high-contrast fitness page built around motion, discipline, and conversion.',
     year: '2026',
     palette: ['#6f8f62', '#1e2221', '#d9e6d0'],
+
   },
   {
-    title: 'video editing',
-    client: 'gremix',
-    category: 'video editing',
-    description: 'A fast visual system for edits, reels, and campaign cuts that keep rhythm first.',
-    year: '2025',
-    palette: ['#485c8f', '#191b26', '#d5ddff'],
-  },
-  {
-    title: 'thumbnail',
-    client: 'opononi',
-    category: 'Development',
-    description: 'Thumbnail art direction with bold framing, strong contrast, and instant read.',
-    year: '2025',
-    palette: ['#7b4e73', '#211c23', '#f0d4e9'],
-  },
-  {
-    title: 'cafe',
+    title: 'Кафе page',
     client: 'lolita',
     category: 'website',
     description: 'A soft editorial cafe site shaped for menu discovery and local atmosphere.',
@@ -44,7 +29,24 @@ const projects = [
     palette: ['#8c6f4f', '#222120', '#efe2ce'],
   },
   {
-    title: 'eregtei strip',
+    title: 'Video editing',
+    client: 'gremix',
+    category: 'video editing',
+    description: 'A fast visual system for edits, reels, and campaign cuts that keep rhythm first.',
+    year: '2025',
+    palette: ['#485c8f', '#191b26', '#d5ddff'],
+  },
+  {
+    title: 'Thumbnail зураг',
+    client: 'opononi',
+    category: 'Development',
+    description: 'Thumbnail art direction with bold framing, strong contrast, and instant read.',
+    year: '2025',
+    palette: ['#7b4e73', '#211c23', '#f0d4e9'],
+  },
+  
+  {
+    title: 'Худалдаа',
     client: 'love',
     category: 'Motion',
     description: 'A motion-led identity piece with stripped-back typography and sharp pacing.',
@@ -52,6 +54,11 @@ const projects = [
     palette: ['#8e3540', '#20191b', '#ffd9df'],
   },
 ];
+
+const projectScrollHold = 0.46;
+const projectScrollTransition = 0.72;
+const projectScrollStep = 1.45;
+const projectScrollTail = 0.7;
 
 const starShapePoints = '372 4 417 183 700 191 466 307 373 660 310 356 0 470 174 278 108 143 291 166';
 const innerStarPoints = '371 110 394 236 555 232 401 300 421 397 344 328 219 407 302 283 249 209 342 218';
@@ -262,7 +269,16 @@ function ProjectsOverlay({ isOpen, isClosing, onClose, onMenu }) {
   function handleStoryScroll(event) {
     const viewportHeight = event.currentTarget.clientHeight || window.innerHeight;
     const maxProgress = projects.length - 1;
-    const nextProgress = event.currentTarget.scrollTop / viewportHeight;
+    const rawProgress = event.currentTarget.scrollTop / viewportHeight;
+    const segmentIndex = Math.min(maxProgress, Math.floor(rawProgress / projectScrollStep));
+    const segmentPhase = rawProgress - segmentIndex * projectScrollStep;
+    const transitionProgress = Math.min(
+      1,
+      Math.max(0, (segmentPhase - projectScrollHold) / projectScrollTransition),
+    );
+    const nextProgress =
+      segmentIndex >= maxProgress ? maxProgress : segmentIndex + transitionProgress;
+
     setScrollProgress(Math.min(maxProgress, Math.max(0, nextProgress)));
   }
 
@@ -363,7 +379,18 @@ function ProjectsOverlay({ isOpen, isClosing, onClose, onMenu }) {
             <span>{String(projects.length).padStart(2, '0')}</span>
           </div>
         </div>
-        <div className="projects-scroll-space" style={{ height: `${projects.length * 100}dvh` }} />
+        <div
+          className="projects-scroll-space"
+          style={{
+            height: `${
+              ((projects.length - 1) * projectScrollStep +
+                projectScrollHold +
+                projectScrollTransition +
+                projectScrollTail) *
+              100
+            }dvh`,
+          }}
+        />
       </div>
     </section>
   );

@@ -740,7 +740,7 @@ button {
   position: fixed;
   top: 27px;
   right: 84px;
-  z-index: 8;
+  z-index: 12;
   text-transform: none;
   font-size: 0.95rem;
 }
@@ -824,13 +824,13 @@ button {
 
 .project-copy h2 {
   position: absolute;
-  top: 43px;
+  top: 76px;
   left: var(--project-left);
-  max-width: min(47vw, 760px);
+  max-width: min(43vw, 680px);
   margin: 0;
   color: rgba(255, 255, 255, 0.94);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(3.3rem, 6.9vw, 8.5rem);
+  font-size: clamp(3rem, 5.9vw, 7.2rem);
   font-weight: 400;
   letter-spacing: 0;
   line-height: 0.85;
@@ -901,10 +901,10 @@ button {
 .project-preview-stack {
   position: absolute;
   z-index: 3;
-  top: clamp(14px, 1.6vw, 30px);
+  top: clamp(70px, 6.2vw, 92px);
   right: clamp(10px, 1.6vw, 30px);
   bottom: clamp(10px, 1.6vw, 30px);
-  width: min(50.5vw, 1040px);
+  width: min(48.5vw, 980px);
   overflow: hidden;
   background: rgba(255, 255, 255, 0.08);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
@@ -1050,7 +1050,7 @@ button {
 .projects-progress {
   position: absolute;
   z-index: 5;
-  right: calc(min(50.5vw, 1040px) + clamp(28px, 4vw, 76px));
+  right: calc(min(48.5vw, 980px) + clamp(28px, 4vw, 76px));
   bottom: 38px;
   display: flex;
   align-items: center;
