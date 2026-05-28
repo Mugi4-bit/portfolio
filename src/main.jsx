@@ -378,6 +378,24 @@ function MenuOverlay({ isOpen, isClosing, onClose, onWork, onAbout, onContact })
     return null;
   }
 
+  function handleMenuLinkClick(event) {
+    const button = event.target.closest('button');
+
+    if (!button || !event.currentTarget.contains(button)) {
+      return;
+    }
+
+    const buttonIndex = Array.from(event.currentTarget.querySelectorAll('button')).indexOf(button);
+
+    if (buttonIndex === 0) {
+      onAbout();
+    }
+
+    if (buttonIndex === 2) {
+      onContact();
+    }
+  }
+
   return (
     <section className={`menu-overlay ${isClosing ? 'is-closing' : ''}`} aria-label="Site menu">
       <ShardReveal active={!isClosing} />
@@ -386,7 +404,7 @@ function MenuOverlay({ isOpen, isClosing, onClose, onWork, onAbout, onContact })
         <span />
       </button>
 
-      <nav className="menu-links" aria-label="Menu links">
+      <nav className="menu-links" aria-label="Menu links" onClick={handleMenuLinkClick}>
         <button type="button">Бидний тухай</button>
         <button type="button" onClick={onWork}>
           Бид юу хийдэг вэ?
@@ -539,6 +557,8 @@ function App() {
   const [mainReturning, setMainReturning] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuClosing, setMenuClosing] = useState(false);
+  const [infoScreen, setInfoScreen] = useState(null);
+  const [infoClosing, setInfoClosing] = useState(false);
   const [titleVisible, setTitleVisible] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [musicPlaying, setMusicPlaying] = useState(false);
@@ -548,6 +568,7 @@ function App() {
   const closeTimer = useRef(null);
   const returnTimer = useRef(null);
   const menuTimer = useRef(null);
+  const infoTimer = useRef(null);
 
   useEffect(() => {
     function startMusic() {
@@ -619,6 +640,30 @@ function App() {
   function openWorkFromMenu() {
     closeMenu();
     window.setTimeout(openProjects, 520);
+  }
+
+  function openInfoFromMenu(kind) {
+    window.clearTimeout(infoTimer.current);
+    closeMenu();
+    setProjectsOpen(false);
+    setProjectsClosing(false);
+    setMainReturning(false);
+    setInfoClosing(false);
+    infoTimer.current = window.setTimeout(() => setInfoScreen(kind), 420);
+  }
+
+  function closeInfoScreen() {
+    if (infoClosing) {
+      return;
+    }
+
+    setInfoClosing(true);
+    setMainReturning(true);
+    infoTimer.current = window.setTimeout(() => {
+      setInfoScreen(null);
+      setInfoClosing(false);
+    }, 760);
+    returnTimer.current = window.setTimeout(() => setMainReturning(false), 1040);
   }
 
   function playAnimation() {
@@ -716,7 +761,10 @@ function App() {
         isClosing={menuClosing}
         onClose={closeMenu}
         onWork={openWorkFromMenu}
+        onAbout={() => openInfoFromMenu('about')}
+        onContact={() => openInfoFromMenu('contact')}
       />
+      <InfoScreen kind={infoScreen} isClosing={infoClosing} onClose={closeInfoScreen} />
     </>
   );
 }
