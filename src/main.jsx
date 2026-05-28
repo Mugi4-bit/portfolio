@@ -1,51 +1,55 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
-
-const filters = ['All Projects', 'Branding', 'Motion', 'Design', 'Development', 'Activation'];
 
 const projects = [
   {
     title: 'Restaurant',
     client: 'Odun Collectives',
     category: 'website',
-    image:
-      '',
+    description: 'A cinematic web experience for a warm dining brand with sharp booking paths.',
+    year: '2026',
+    palette: ['#b66f43', '#242529', '#f1d9bf'],
   },
   {
     title: 'gym page',
     client: 'Odun Collectives',
     category: 'website',
-    image:
-      '',
+    description: 'A high-contrast fitness page built around motion, discipline, and conversion.',
+    year: '2026',
+    palette: ['#6f8f62', '#1e2221', '#d9e6d0'],
   },
   {
     title: 'video editing',
     client: 'gremix',
     category: 'video editing',
-    image:
-      '',
+    description: 'A fast visual system for edits, reels, and campaign cuts that keep rhythm first.',
+    year: '2025',
+    palette: ['#485c8f', '#191b26', '#d5ddff'],
   },
   {
     title: 'thumbnail',
     client: 'opononi',
     category: 'Development',
-    image:
-      '',
+    description: 'Thumbnail art direction with bold framing, strong contrast, and instant read.',
+    year: '2025',
+    palette: ['#7b4e73', '#211c23', '#f0d4e9'],
   },
   {
     title: 'cafe',
     client: 'lolita',
     category: 'website',
-    image:
-      '',
+    description: 'A soft editorial cafe site shaped for menu discovery and local atmosphere.',
+    year: '2025',
+    palette: ['#8c6f4f', '#222120', '#efe2ce'],
   },
   {
     title: 'eregtei strip',
     client: 'love',
     category: 'Motion',
-    image:
-      '',
+    description: 'A motion-led identity piece with stripped-back typography and sharp pacing.',
+    year: '2024',
+    palette: ['#8e3540', '#20191b', '#ffd9df'],
   },
 ];
 
@@ -243,16 +247,24 @@ function MenuOverlay({ isOpen, isClosing, onClose, onWork }) {
 }
 
 function ProjectsOverlay({ isOpen, isClosing, onClose, onMenu }) {
-  const [filter, setFilter] = useState('All Projects');
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  const storyRef = useRef(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
-  const visibleProjects = useMemo(() => {
-    if (filter === 'All Projects') {
-      return projects;
+  useEffect(() => {
+    if (!isOpen || !storyRef.current) {
+      return;
     }
 
-    return projects.filter((project) => project.category === filter);
-  }, [filter]);
+    storyRef.current.scrollTop = 0;
+    setScrollProgress(0);
+  }, [isOpen]);
+
+  function handleStoryScroll(event) {
+    const viewportHeight = event.currentTarget.clientHeight || window.innerHeight;
+    const maxProgress = projects.length - 1;
+    const nextProgress = event.currentTarget.scrollTop / viewportHeight;
+    setScrollProgress(Math.min(maxProgress, Math.max(0, nextProgress)));
+  }
 
   if (!isOpen) {
     return null;
@@ -270,54 +282,88 @@ function ProjectsOverlay({ isOpen, isClosing, onClose, onMenu }) {
         <span />
       </button>
 
-      <div className="side-arrow side-arrow-left" aria-hidden="true">
-        &uarr;
-      </div>
-      <div className="side-arrow side-arrow-right" aria-hidden="true">
-        &darr;
-      </div>
+      <div className="projects-story" ref={storyRef} onScroll={handleStoryScroll}>
+        <div className="projects-scene">
+          <div className="project-copy-stack">
+            {projects.map((project, index) => {
+              const offset = index - scrollProgress;
+              const distance = Math.abs(offset);
+              const opacity = Math.max(0, 1 - distance * 1.1);
+              const translateY = offset > 0 ? offset * 82 : offset * 56;
 
-      <div className="projects-inner">
-        <div className="filter-block">
-          <span>Filter</span>
-          <button
-            className="filter-current"
-            type="button"
-            onClick={() => setFiltersOpen((value) => !value)}
-            aria-expanded={filtersOpen}
-          >
-            {filter}
-            <span aria-hidden="true">v</span>
-          </button>
-          {filtersOpen && (
-            <div className="filter-menu">
-              {filters.map((item) => (
-                <button
-                  type="button"
-                  key={item}
-                  onClick={() => {
-                    setFilter(item);
-                    setFiltersOpen(false);
+              return (
+                <article
+                  className="project-copy"
+                  key={project.title}
+                  style={{
+                    '--copy-y': `${translateY}px`,
+                    opacity,
+                    filter: `blur(${Math.min(distance * 10, 10)}px)`,
                   }}
                 >
-                  {item}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+                  <p className="project-kicker">All Projects</p>
+                  <h2>{project.title}</h2>
+                  <div className="project-meta">
+                    <span>{project.category}</span>
+                    <span>Client: {project.client}</span>
+                    <span>{project.year}</span>
+                  </div>
+                  <p className="project-description">{project.description}</p>
+                  <a className="project-case-link" href="#project-case" onClick={(event) => event.preventDefault()}>
+                    Explore case study
+                    <span aria-hidden="true">-&gt;</span>
+                  </a>
+                </article>
+              );
+            })}
+          </div>
 
-        <div className="project-grid">
-          {visibleProjects.map((project) => (
-            <article className="project-card" key={project.title}>
-              <div className="project-image">
-                <img src={project.image} alt="" />
-              </div>
-              <h4>{project.title}</h4>
-              <p>{project.client}</p>
-            </article>
-          ))}
+          <div className="project-preview-stack" aria-hidden="true">
+            {projects.map((project, index) => {
+              const offset = index - scrollProgress;
+              const isVisible = offset > -1.02 && offset < 1.06;
+              const slideY = offset > 0 ? offset * 100 : 0;
+
+              return (
+                <div
+                  className="project-preview-layer"
+                  key={project.title}
+                  style={{
+                    '--tone-a': project.palette[0],
+                    '--tone-b': project.palette[1],
+                    '--tone-c': project.palette[2],
+                    opacity: isVisible ? 1 : 0,
+                    transform: `translateY(${slideY}%)`,
+                    zIndex: index + 1,
+                  }}
+                >
+                  <div className="project-browser-bar">
+                    <span>odun</span>
+                    <span>{project.category}</span>
+                    <span>{project.year}</span>
+                  </div>
+                  <div className="project-preview-art">
+                    <span className="preview-orbit" />
+                    <span className="preview-light preview-light-one" />
+                    <span className="preview-light preview-light-two" />
+                    <span className="preview-block" />
+                  </div>
+                  <div className="project-preview-caption">
+                    <strong>{project.title}</strong>
+                    <span>{project.client}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="projects-progress" aria-hidden="true">
+            <span>{String(Math.min(projects.length, Math.floor(scrollProgress) + 1)).padStart(2, '0')}</span>
+            <i />
+            <span>{String(projects.length).padStart(2, '0')}</span>
+          </div>
         </div>
+        <div className="projects-scroll-space" style={{ height: `${projects.length * 100}dvh` }} />
       </div>
     </section>
   );
