@@ -1,15 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
+import thumbnailSrc from './data/opop.jpg';
+import videoSrc from './data/food.mp4';
+import gymSrc from './data/gym.mp4';
 
 const projects = [
   {
-    title: 'Ресторан',
+    title: 'Вэб сайт',
     client: 'Odun Collectives',
     category: 'website',
-    description: 'A cinematic web experience for a warm dining brand with sharp booking paths.',
+    description: 'Орчин үеийн дизайнтай үйлчилгээний газрын вэб сайт (кафе , ресторан г.м... ).',
     year: '2026',
-    palette: ['#b66f43', '#242529', '#f1d9bf'],
+    accent: '#b66f43',
+    media: {
+      type: 'video',
+      src: videoSrc,
+      poster: '',
+      alt: 'Project video preview',
+    },
   },
   {
     title: 'Фитнес page',
@@ -17,32 +26,33 @@ const projects = [
     category: 'website',
     description: 'A high-contrast fitness page built around motion, discipline, and conversion.',
     year: '2026',
-    palette: ['#6f8f62', '#1e2221', '#d9e6d0'],
-
+    accent: '#6f8f62',
+    media: {
+      type: 'video',
+      src: gymSrc,
+      poster: thumbnailSrc,
+      alt: 'Project video preview',
+    },
   },
-  {
-    title: 'Кафе page',
-    client: 'lolita',
-    category: 'website',
-    description: 'A soft editorial cafe site shaped for menu discovery and local atmosphere.',
-    year: '2025',
-    palette: ['#8c6f4f', '#222120', '#efe2ce'],
-  },
+  
+    
   {
     title: 'Video editing',
     client: 'gremix',
     category: 'video editing',
     description: 'A fast visual system for edits, reels, and campaign cuts that keep rhythm first.',
     year: '2025',
-    palette: ['#485c8f', '#191b26', '#d5ddff'],
+    accent: '#485c8f',
+    media: { type: 'video', src: '', poster: '', alt: 'Video editing reel preview' },
   },
   {
     title: 'Thumbnail зураг',
-    client: 'opononi',
+    client: 'Opononi',
     category: 'Development',
-    description: 'Thumbnail art direction with bold framing, strong contrast, and instant read.',
+    description: 'Үзэгчдийг татахуйц, видео агуулгын гол сэдвийг тод харуулсан, сонирхолтой thumbnail зураг.',
     year: '2025',
-    palette: ['#7b4e73', '#211c23', '#f0d4e9'],
+    accent: '#7b4e73',
+    media: { type: 'image', src: thumbnailSrc, alt: 'Thumbnail design preview' },
   },
   
   {
@@ -51,7 +61,8 @@ const projects = [
     category: 'Motion',
     description: 'A motion-led identity piece with stripped-back typography and sharp pacing.',
     year: '2024',
-    palette: ['#8e3540', '#20191b', '#ffd9df'],
+    accent: '#8e3540',
+    media: { type: 'video', src: '', poster: '', alt: 'Motion project preview' },
   },
 ];
 
@@ -59,6 +70,40 @@ const projectScrollHold = 0.46;
 const projectScrollTransition = 0.72;
 const projectScrollStep = 1.45;
 const projectScrollTail = 0.7;
+
+const infoScreens = {
+  about: {
+    eyebrow: 'About us',
+    title: 'Odun Collectives',
+    lead: 'A creative studio shaping visual systems, websites, motion, and digital experiences with atmosphere and intent.',
+    details: ['Brand', 'Content', 'Experience', 'Digital'],
+    footerLabel: 'Selected focus',
+    footerText: 'Identity - Web - Motion - Campaigns',
+  },
+  contact: {
+    eyebrow: 'Contact',
+    title: 'Let us build together',
+    lead: 'Tell us what you want to make, launch, polish, or turn into something people remember.',
+    details: ['oduncollectives@example.com', '+976 0000 0000', 'Ulaanbaatar'],
+    footerLabel: 'Available for',
+    footerText: 'Websites - Visual direction - Video editing - Launch assets',
+  },
+};
+
+const floatingLetters = [
+  ['O', '7%', '13%', '112px', '-24deg', '0ms'],
+  ['D', '22%', '-4%', '148px', '19deg', '220ms'],
+  ['U', '53%', '9%', '118px', '-12deg', '90ms'],
+  ['N', '77%', '-2%', '162px', '31deg', '310ms'],
+  ['C', '84%', '20%', '94px', '-38deg', '140ms'],
+  ['O', '10%', '48%', '132px', '42deg', '410ms'],
+  ['L', '31%', '68%', '90px', '-19deg', '180ms'],
+  ['L', '62%', '61%', '130px', '16deg', '500ms'],
+  ['E', '81%', '72%', '108px', '-8deg', '260ms'],
+  ['C', '92%', '49%', '76px', '27deg', '620ms'],
+  ['T', '46%', '35%', '88px', '-31deg', '340ms'],
+  ['S', '16%', '78%', '96px', '13deg', '720ms'],
+];
 
 const starShapePoints = '372 4 417 183 700 191 466 307 373 660 310 356 0 470 174 278 108 143 291 166';
 const innerStarPoints = '371 110 394 236 555 232 401 300 421 397 344 328 219 407 302 283 249 209 342 218';
@@ -229,7 +274,106 @@ function ShootingStars() {
   );
 }
 
-function MenuOverlay({ isOpen, isClosing, onClose, onWork }) {
+function ProjectMedia({ project }) {
+  const media = project.media;
+
+  if (media?.src && media.type === 'video') {
+    return (
+      <video
+        className="project-media"
+        src={media.src}
+        poster={media.poster || undefined}
+        autoPlay
+        loop
+        muted
+        playsInline
+        aria-label={media.alt || project.title}
+      />
+    );
+  }
+
+  if (media?.src) {
+    return <img className="project-media" src={media.src} alt={media.alt || project.title} />;
+  }
+
+  return (
+    <div className="project-preview-art">
+      <span className="preview-orbit" />
+      <span className="preview-light preview-light-one" />
+      <span className="preview-light preview-light-two" />
+      <span className="preview-block" />
+    </div>
+  );
+}
+
+function FloatingLetterBackground({ onPointerMove }) {
+  return (
+    <div className="letter-field" aria-hidden="true" onPointerMove={onPointerMove}>
+      {floatingLetters.map(([letter, x, y, size, rotate, delay], index) => (
+        <span
+          className="letter-shard"
+          key={`${letter}-${index}`}
+          style={{
+            '--x': x,
+            '--y': y,
+            '--size': size,
+            '--rotate': rotate,
+            '--delay': delay,
+          }}
+        >
+          {letter}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function InfoScreen({ kind, isClosing, onClose }) {
+  const content = infoScreens[kind];
+  const [cursor, setCursor] = useState({ x: 0, y: 0 });
+
+  function handlePointerMove(event) {
+    const x = (event.clientX / window.innerWidth - 0.5) * 32;
+    const y = (event.clientY / window.innerHeight - 0.5) * 28;
+    setCursor({ x, y });
+  }
+
+  if (!content) {
+    return null;
+  }
+
+  return (
+    <section
+      className={`info-screen ${isClosing ? 'is-closing' : ''}`}
+      style={{
+        '--cursor-x': `${cursor.x}px`,
+        '--cursor-y': `${cursor.y}px`,
+      }}
+      onPointerMove={handlePointerMove}
+      aria-label={content.eyebrow}
+    >
+      <FloatingLetterBackground onPointerMove={handlePointerMove} />
+      <button className="info-back close-projects" type="button" onClick={onClose}>
+        Ð‘ÑƒÑ†Ð°Ñ…
+      </button>
+
+      <div className="info-content">
+        <p className="info-eyebrow info-type">{content.eyebrow}</p>
+        <h2 className="info-title info-type">{content.title}</h2>
+        <div className="info-rule" />
+        <p className="info-lead info-type">{content.lead}</p>
+        <p className="info-details">{content.details.join(' - ')}</p>
+        <div className="info-rule" />
+        <div className="info-footer">
+          <span>{content.footerLabel}</span>
+          <p>{content.footerText}</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MenuOverlay({ isOpen, isClosing, onClose, onWork, onAbout, onContact }) {
   if (!isOpen) {
     return null;
   }
@@ -345,9 +489,7 @@ function ProjectsOverlay({ isOpen, isClosing, onClose, onMenu }) {
                   className="project-preview-layer"
                   key={project.title}
                   style={{
-                    '--tone-a': project.palette[0],
-                    '--tone-b': project.palette[1],
-                    '--tone-c': project.palette[2],
+                    '--accent': project.accent || '#6f8f8a',
                     opacity: isVisible ? 1 : 0,
                     transform: `translateY(${slideY}%)`,
                     zIndex: index + 1,
@@ -358,12 +500,7 @@ function ProjectsOverlay({ isOpen, isClosing, onClose, onMenu }) {
                     <span>{project.category}</span>
                     <span>{project.year}</span>
                   </div>
-                  <div className="project-preview-art">
-                    <span className="preview-orbit" />
-                    <span className="preview-light preview-light-one" />
-                    <span className="preview-light preview-light-two" />
-                    <span className="preview-block" />
-                  </div>
+                  <ProjectMedia project={project} />
                   <div className="project-preview-caption">
                     <strong>{project.title}</strong>
                     <span>{project.client}</span>
@@ -404,10 +541,40 @@ function App() {
   const [menuClosing, setMenuClosing] = useState(false);
   const [titleVisible, setTitleVisible] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const [musicReady, setMusicReady] = useState(false);
+  const audioRef = useRef(null);
   const animationTimer = useRef(null);
   const closeTimer = useRef(null);
   const returnTimer = useRef(null);
   const menuTimer = useRef(null);
+
+  useEffect(() => {
+    function startMusic() {
+      if (!audioRef.current || musicReady) {
+        return;
+      }
+
+      audioRef.current.volume = 0.42;
+      audioRef.current
+        .play()
+        .then(() => {
+          setMusicReady(true);
+          setMusicPlaying(true);
+        })
+        .catch(() => {
+          setMusicPlaying(false);
+        });
+    }
+
+    window.addEventListener('pointerdown', startMusic, { once: true });
+    window.addEventListener('keydown', startMusic, { once: true });
+
+    return () => {
+      window.removeEventListener('pointerdown', startMusic);
+      window.removeEventListener('keydown', startMusic);
+    };
+  }, [musicReady]);
 
   function openProjects() {
     window.clearTimeout(closeTimer.current);
@@ -465,8 +632,40 @@ function App() {
     });
   }
 
+  function toggleMusic() {
+    if (!audioRef.current) {
+      return;
+    }
+
+    if (audioRef.current.paused) {
+      audioRef.current.volume = 0.42;
+      audioRef.current
+        .play()
+        .then(() => {
+          setMusicReady(true);
+          setMusicPlaying(true);
+        })
+        .catch(() => setMusicPlaying(false));
+      return;
+    }
+
+    audioRef.current.pause();
+    setMusicPlaying(false);
+  }
+
   return (
     <>
+      <audio ref={audioRef} src="/audio/lalar.mp3" loop preload="auto" />
+      <button
+        className={`music-toggle ${musicPlaying ? 'is-playing' : ''}`}
+        type="button"
+        onClick={toggleMusic}
+        aria-label={musicPlaying ? 'Pause background music' : 'Play background music'}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
       <main
         className={`site-shell ${playing ? 'animation-playing' : ''} ${mainReturning ? 'is-returning' : ''} ${
           titleVisible ? 'is-title-visible' : ''
